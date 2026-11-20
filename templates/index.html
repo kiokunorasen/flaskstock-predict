@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja"> 
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIで株価予測アプリ | Flask</title>
+  <!-- url_for を追加 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container toolbar-inner">
+      <span class="brand-mark">F</span>
+      <span class="brand">FinTech Lab
+        <span class="brand-light">/Flask Edition</span>
+      </span>
+      <span class="eyebrow">Python学習用デモ</span>
+    </div><!-- toolbar-inner を閉じる -->
+  </header><!-- header を閉じる -->
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero">
+        <div class="hero-kicker">FINANCIAL DATA * MACHINE LEARNING</div>
+        <h1>AIで株価分析・予測アプリ</h1>
+        <p>株価の変動を可視化し、線形回帰モデルを使って将来30期間の終値を予測します</p>
+        <div class="tech-tags">
+          <span>Flask</span>
+          <span>yfinance</span>
+          <span>scikit-learn</span>
+          <span>Plotly</span>
+        </div>
+      </div><!-- div.hero を閉じる -->
+    </section>
+
+    <!-- "" を " に修正 -->
+    <section class="search-card" aria-labelledby="ticker-label">
+      <form action="{{ url_for('index') }}" method="post">
+        <label for="ticker" id="ticker-label">株価銘柄のティッカーシンボル</label>
+        <p class="hint">
+          例: AAPL( Apple ) / MSFT( Microsoft ) / 7203.T ( トヨタ ) / BTC-USD ( Bitcoin )
+        </p>
+        <div class="form-controls">
+          <!-- pattern の 0-^ を 0-9^ に修正 -->
+          <input type="text" id="ticker" name="ticker" value="{{ ticker }}" placeholder="AAPL" maxlength="18"
+            pattern="[A-Za-z0-9^=._-]{1,18}" autocomplete="off" required spellcheck="false">
+          <button type="submit" name="action" value="analyze" class="btn btn-primary">
+            株価を分析する</button>
+          <button type="submit" name="action" value="predict" class="btn btn-accent">
+            30期間先を予測する</button>
+        </div>
+        <!-- httms を https に修正 -->
+        <p class="hint foot-hint">銘柄は <a href="https://finance.yahoo.com/" target="_blank"
+            rel="noopener noreferrer">Yahoo Finance</a> 等で確認できます データの取得にはネット接続が必要です</p>
+      </form>
+    </section>
+
+    {% if error %}
+    <!-- erroe-card を error-card に修正 -->
+    <section role="alert" class="error-card"><strong>取得・分析できませんでした</strong>
+      <p>{{ error }}</p>
+    </section>
+    {% endif %}
+
+    {% if has_data %}
+    <div class="results-header">
+      <div>
+        <p class="section-overline">MARKET OVERVIEW</p>
+        <h2>{{ ticker }} <span class="title-muted">株価分析</span></h2>
+      </div>
+      <!-- timestump を timestamp に修正 -->
+      <p class="timestamp">最新の取得日 {{ summary.last_date }}</p>
+    </div>
+
+    <!-- 4つの stat を1つのグリッドにまとめる (余分な </div> を削除) -->
+    <div class="stats-grid"><!-- status-grid から修正 (CSSと合わせてね) -->
+      <article class="stat">
+        <div class="stat-label">最新の終値</div>
+        <div class="stat-value">{{ summary.close }}</div>
+        <div class="stat-help">銘柄の取引通貨で表示</div>
+      </article>
+
+      <article class="stat">
+        <div class="stat-label">前の取引日からの変化</div>
+        <div class="stat-value">{{ summary.previous_change_pct }}</div>
+        <div class="stat-help">終値ベースの騰落率</div>
+      </article>
+
+      <article class="stat">
+        <div class="stat-label">14期間移動平均</div>
+        <div class="stat-value">{{ summary.sma14 }}</div>
+        <div class="stat-help">SMA14</div>
+      </article>
+
+      <article class="stat">
+        <div class="stat-label">取得したデータ数</div>
+        <div class="stat-value">{{ summary.data_count }}</div>
+        <div class="stat-help">2021-01-05の日足</div>
+      </article>
+    </div>
+
+    
+  </div></header>
+</body>
+</html>
